@@ -1,0 +1,33 @@
+@startuml
+title:硬卡联机消费流程
+autonumber
+app->apps:终端参数下载 （/app/merchant/terminal/paramdownload.do） terminalNo
+apps->ams:终端参数下载 terminalNo
+ams-->apps:终端参数
+apps-->app:终端参数 aidList，whiteList
+app->app:碰卡
+app->app:根据aid循环匹配读卡
+app->apps:<font color=red>获取支付活动列表 checkData
+apps->rout:<font color=red> 验卡 checkData
+rout-->apps:验卡结果
+apps->apps:查询pcard 存储过程得到支付活动列表
+apps-->app:返回支付活动 paymentToken，paymentList
+app->app:选择支付活动
+app->apps:免密收款接口 （/app/merchant/hardcard/submit）
+note left:paymentToken，cardId,costList
+apps->apps:获取配置免密金额
+apps->apps:判断消费金额和免密金额
+alt 消费金额大于免密金额
+apps-->app:需要输入密码
+app->app:输入密码
+app->apps:有密收款接口（/app/merchant/hardcard/payment）
+note left:paymentToken,costList,cardPwd
+apps->rout:消费
+rout-->apps:消费结果
+apps-->app:消费结果
+else 消费金额小于等于免密金额
+apps->rout:消费
+rout-->apps:消费结果
+apps-->app:消费结果
+end
+@enduml

@@ -1,0 +1,53 @@
+@startuml
+title:硬卡脱机充值
+autonumber
+app->apps:获取aid列表 (/app/personal/offlineWallet/aid)
+apps-->app:返回aid列表
+app->app:碰卡，根据aid读卡
+app->apps:(/app/personal/offlineWallet/list) 获取可充值钱包,routeInfo,prdtId
+apps->rout:获取机构号
+rout-->apps:返回机构信息
+apps->apps:查询pcard得到产品信息
+apps->app:返回可充值钱包
+...
+app->apps:获取充值方式(/app/personal/newPaymentMode/list) prdtId,cardId,brhId
+apps->apps:查询转账交易控制表信息
+apps->ams:查询折扣信息
+ams-->apps:返回折扣信息
+apps->apps:当前用户下银行卡
+apps-->app:充值方式列表，充值比例
+...
+app->app:选择卡片充值
+alt 选择集卡充值
+app->apps:<font color=red>充值申请（/app/personal/offlineWallet/application）walletCardInfo，routeInfo
+apps->rout:<font color=red>充值申请 checkData
+rout-->apps:充值申请结果 mac2,termianlNo
+apps-->app:充值请结果 mac2,termianlNo
+app->app:写卡
+app->apps:<font color=red>写卡确认（/app/personal/offlineWallet/submit）walletCardInfo，routeInfo，writecardsta
+apps->rout:<font color=red>写卡确认 checkData
+rout-->apps:写卡确认结果
+apps-->app:satus,rechargeAmt,写卡确认结果
+else 选择银行卡充值
+app->apps:获取充值验证码 cardId,prdtId
+apps->rout:获取充值验证码,充值申请
+rout-->apps:充值申请结果
+apps-->app:申请结果，orderId,token
+app->app:输入短信验证码
+app->apps:<font color=red> 支付确认 cardCheckData，smsCode,token
+apps->rout: <font color=red> 验卡 checkData
+rout-->apps:验卡结果
+apps->rout:支付确认 smsCode
+rout-->apps:支付结果
+apps->app:支付结果，orderId
+app->apps:写卡申请<font color=red> （/app/personal/offlineWallet/bankApply） checkData
+apps->rout:<font color=red> 写卡申请，checkData
+rout-->apps:写卡申请结果，mac2,terminalTranNo
+apps-->app:写卡申请结果 mac2,terminalTranNo
+app->app:写卡
+app->apps:<font color=red>写卡确认（/app/personal/offlineWallet/bankConfirm） checkData,写卡状态
+apps->rout:<font color=red> 写卡确认 checkData
+rout-->apps:写卡确认结果
+apps-->app:写卡确认结果
+end
+@enduml

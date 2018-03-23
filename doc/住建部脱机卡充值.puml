@@ -1,0 +1,11 @@
+@startuml
+title:住建部脱机卡充值
+autonumber
+card->terminal:mac1(对称签名)
+terminal->encryptor:校验mac1
+encryptor-->terminal:返回校验结果，mac2
+terminal-->card:mac2
+card->card:校验mac2(金额),写卡
+card->terminal:写卡结果
+terminal->server:写卡确认
+@enduml

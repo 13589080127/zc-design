@@ -1,0 +1,14 @@
+@startuml
+title:住建部脱机卡消费
+autonumber
+card->terminal:申请mac1
+terminal->encryptor:申请mac1
+encryptor-->terminal:mac1
+terminal-->card:mac1
+card->card:校验mac1
+card->card:写卡
+card->terminal:写卡结果，mac2,tac
+terminal->encryptor:校验mac2
+encryptor-->terminal:校验结果，根据结果提示消费信息
+terminal-->server:脱机上送tac
+@enduml

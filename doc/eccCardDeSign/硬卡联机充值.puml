@@ -1,0 +1,42 @@
+@startuml
+title:硬卡联机充值流程
+autonumber
+app->apps:获取aid列表 (/app/personal/offlineWallet/aid)
+apps-->app:返回aid列表
+app->app:碰卡，根据aid读卡
+
+app->apps:<font color=red>cardId,checkData 查询硬卡详情 (/app/personal/hardcard/detail)
+
+apps->rout:checkData 验卡
+rout-->apps:验卡结果
+apps->apps:查询卡详情 查询pcard
+apps-->app:返回卡详情
+...
+app->app:点击充值
+app->apps:查询可充值方式 （/app/personal/tat/paymentMode/list） 卡号，产品号
+apps->apps:查询当前集卡转账规则，和当前所绑定的银行卡
+apps-->app:返回充值方式
+...
+app->app:选择充值卡片
+alt 选择集卡充值
+app->apps:<font color=red>(/app/personal/hardcard/recharge) 充值
+note left:outCardCheckData，inCardCheckData
+apps->rout:充值
+rout-->apps:充值结果
+apps-->app:充值结果
+else 选择银行卡
+note left:routInfo,prdtId
+app->apps:(app/personal/directRecharge/hardCardCode) 获取短信验证码
+apps->rout:充值申请，获取验证码
+rout-->apps:充值申请结果
+apps-->app:获取验证码结果,brhId,brandId,token,orderId
+app->app:填写短信验证码
+app->apps:<font color=red>支付确认
+note left:cardCheckData,token,orderId，smsCode
+apps->rout:验卡
+rout-->apps:验卡结果
+apps->rout:支付确认
+rout-->apps:支付确认结果
+apps->app:支付结果
+end
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+title:硬卡脱机消费
+autonumber
+app->apps:终端参数下载(/app/merchant/terminal/paramdownload.do)
+note left:terminalNo
+apps->ams:终端参数下载 terminalNo
+ams-->apps:终端参数
+apps-->app:终端参数whiteList，aidList
+app->app:碰卡
+app->app:根据aid循环匹配读卡
+app->apps:<font color=red>申请mac1(/app/merchant/applyMac1)
+note left:routeInfo,cardInfo
+apps->rout:<font color=red>申请mac1,cardInfo,routeInfo
+rout-->apps:申请结果,mac1
+apps-->app:mac1
+app->app:写卡，判断写卡结果
+alt 写卡失败
+app->app:消费失败
+else 写卡成功
+app->apps:<font color=red>确认mac2
+note left:routeInfo,cardInfo
+apps->rout:<font color=red>确认mac2,routeInfo,cardInfo
+rout-->apps:确认结果
+apps-->app:确认结果
+app->apps:脱机交易上送(/app/merchant/offLineTradeUpload)
+note left:terminalNo,terminalBatchNo
+apps->apps:更新脱机交易订单状态
+apps-->app:上送结果
+apps->rout:定时任务 上传脱机交易
+rout->apps:上送结果
+end
+@enduml
