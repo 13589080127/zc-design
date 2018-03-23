@@ -21,7 +21,7 @@ app->app:选择充值卡片
 alt 选择集卡充值
 app->apps:<font color=red>(/app/personal/hardcard/recharge) 充值
 note left:outCardCheckData，inCardCheckData
-apps->rout:充值
+apps->rout:<font color=red > biaoji 充值
 rout-->apps:充值结果
 apps-->app:充值结果
 else 选择银行卡

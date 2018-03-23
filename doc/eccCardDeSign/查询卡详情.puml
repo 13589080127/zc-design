@@ -1,0 +1,6 @@
+@startuml
+title:查询卡详情
+app->apps:查询卡详情，（/app/personal/tat/cards/detail）
+apps->ams:查询卡详情
+
+@enduml
