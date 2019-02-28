@@ -1,0 +1,40 @@
+@startuml
+title:用户登录注册
+autonumber
+app->app:判断本地是否存在设备se
+alt 不存在
+app->tsm:申请设备se
+tsm->app:下发设备se
+app->app:输入手机号码，同意wpay用户使用协议
+app->tsm:申请匿名用户se
+note left:使用设备se进行签名加密
+tsm->tsm:返回匿名用户se
+end
+app->app:输入手机号码，同意wpay用户使用协议
+app->apps:使用设备se进行签名加密 发送短信验证码
+note left:/app/sms/sendValidCode.do \napp标识，手机号码，短信模板id
+apps->apps:根据短信模板id发送短信验证码
+apps->sms:发送短信验证码
+app->app:输入短信验证码
+app->apps:验证码短信
+note left:/app/sms/checkValidCode \n手机号码，短信验证码，模板id
+apps->sms:校验短信验证码
+sms->apps:校验结果
+apps->apps:产生token
+apps->app:返回 smsPassToken
+app->apps:登录/注册 phone,smsPassToken
+apps->apps:验证smsPassToken
+apps->apps:判断当前手机号码是否已经注册
+alt 未注册
+apps->apps:随机产生6位密码
+apps->uc:手机号码，密码 用户注册
+else 已注册
+apps->apps:获取当前用户密码
+apps->uc:用户登录
+end
+uc->apps:返回cUserId,token
+apps->apps:保存token，cUserId
+apps->app:返回token和cUserId
+app->tsm:申请用户se
+tsm->app:下发用户se
+@enduml

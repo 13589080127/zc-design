@@ -1,0 +1,23 @@
+@startuml
+title:获取默认卡片
+autonumber
+app->app:判断本地是否有卡文件
+alt 不存在
+app->app:判断本地是否存在卡号
+alt 有卡号
+app->apps:根据卡号找回虚拟卡
+apps->app:返回虚拟卡文件
+else 没有卡号
+app->apps:获取卡号
+apps->app:返回查询结果
+app->app: 判断查询结果
+alt 结果为E004
+app->apps:根据机构号和品牌号开通虚拟卡
+apps->app:返回虚拟卡文件
+else 结果为E000
+app->apps:根据虚拟卡卡号找回虚拟卡
+apps->app:返回虚拟卡文件
+end
+end
+end
+@enduml
