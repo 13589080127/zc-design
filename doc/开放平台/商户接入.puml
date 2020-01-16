@@ -1,0 +1,18 @@
+@startuml
+title:商户接入
+autonumber
+participant  开放平台 as 开放平台
+participant  tsm as tsm
+participant  lgmApps as apps
+开放平台->开放平台: 打开开放平台
+
+
+
+
+
+
+
+
+
+
+@enduml

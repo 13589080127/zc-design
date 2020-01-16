@@ -1,0 +1,43 @@
+@startuml
+title:wpay支付
+autonumber
+camall->camall:选择使用wpay支付
+camall->camallServer:进行订单签名
+camallServer-->camall:返回签名数据和订单原数据 包含支付成功时的回调地址
+camall->sdk:发起支付 签名数据和订单原数据
+sdk->apps:根据商户号查询支付方式和支付活动 返回的支付方式到达产品级别
+apps-->sdk:返回支付活动
+sdk->sdk:输入密码（此时免密金额的开关对此功能无法使用）
+sdk->apps:支付
+note left:扣款卡号\n验卡信息\n商户号\n订单签名数据\n订单数据\n扣款金额\n支付活动\n密码\n币种
+apps->apps:锁住当前外部订单号
+apps->apps:校验订单签名
+apps->apps:校验此卡号和此商户的支付活动
+apps->apps:校验支付金额和付款金额
+apps->apps:校验外部订单号是否已经存在且是否是退款或者是已经支付
+apps->apps:记录流水信息 支付信息和payId 和 balance
+apps->rout:商户号，验卡token，支付卡号，支付金额，外部订单号，apps订单号
+apps->apps:只等待配置秒，未返回直接返回给sdk 后续支付成功将信息异步推送给camallServer
+rout-->apps:支付结果
+apps->apps:记录订单 解锁订单
+apps-->sdk:返回支付结果
+sdk->sdk:显示支付结果
+apps-->camallServer:根据回调地址进行异步通知
+...
+camallServer->apps:发起退货
+note left:支付时传入的订单号\n支付成功apps返回的订单号\n退货订单号\n退款金额\n商户号
+apps->apps:锁住当前外部订单号
+apps->apps:判断外部订单号是否存在
+apps->apps:校验当前支付订单号是否是支付成功
+apps->apps:根据支付订单号得到payId和商户号
+apps->apps:比对商户号和支付时商户号是否一致
+apps->apps:判断此次退款金额+已完成+退款中的金额是否大于支付总金额
+alt 大于支付总金额
+apps-->camallServer:返回退款金额不能大于支付支付金额
+end
+apps->rout:商户号，payId,退款产品数量，退款卡号
+rout-->apps:返回退款结果
+apps->apps:根据退款结果更新数据库状态
+apps->apps:解锁订单
+apps-->camallServer:返回退款结果
+@enduml
