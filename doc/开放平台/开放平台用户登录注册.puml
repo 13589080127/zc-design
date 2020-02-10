@@ -1,0 +1,57 @@
+@startuml
+title:开发平台用户登录注册
+autonumber
+participant  开放平台H5 as H5
+participant  lgmPlatManage as MANAGE
+participant  用户中心 as UC
+H5->H5:输入用户名密码
+H5->MANAGE:请求登录
+note left:用户名，密码
+MANAGE->UC:请求用户登录接口
+UC-->MANAGE:返回登录结果
+MANAGE->MANAGE:判断登录结果
+alt 登录失败
+MANAGE->MANAGE:进行错误码转换
+MANAGE-->H5:返回转换以后的错误信息提示
+else 登录成功
+MANAGE->MANAGE:存储用户信息 token时效为30天时间
+MANAGE->MANAGE:查询当前用户信息完善级别
+alt 详细信息未完善
+MANAGE-->H5:返回用户唯一Id 登录的token，用户信息的完善级别0
+else 详细信息已完善
+MANAGE-->H5:返回用户唯一Id 登录的token，用户信息的完善级别
+end
+H5->H5:根据用户信息的完善级别判断跳转到哪个页面
+end
+...
+H5->H5:用户点击注册
+H5->H5:调转到填写用户邮箱和密码页面
+H5->H5:输入用户的邮箱，密码，图片验证码
+H5->MANAGE:请求服务进行发送邮件
+note left:用户的邮箱，密码
+MANAGE->UC:判断用户的邮箱是否已经注册
+note left:用户的邮箱,appId
+UC-->MANAGE:返回判断结果
+alt 用户已经注册
+MANAGE-->H5:返回用户已经注册的错误码
+else 用户未注册
+MANAGE->MANAGE:为当前邮箱产生一个签名
+MANAGE->MANAGE:为当前邮箱账号产生一个redis对应的签名和密码存储时间48小时
+MANAGE->MANAGE:将激活地址发送给当前用户的邮箱
+MANAGE->MANAGE:判断当前用户的邮箱属于哪种类型邮箱
+MANAGE-->H5:返回类型邮箱，邮箱账号，用户信息完善级别
+end
+H5->H5:判断返回的错误码
+alt 失败错误码
+H5->H5:提示错误信息
+else 成功的返回码
+H5->H5:展示第二步的页面
+H5->H5:建立mq 通信 监听mq推送的消息
+alt 收到mq消息
+H5->H5:获得用户token,cUserId,用户信息完善级别
+H5->H5:跳转到第三步页面
+end
+end
+H5->H5:点击重新发送
+H5->MANAGE:重复 请求服务进行发送邮箱 流程
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+title:授权结果查询
+autonumber
+mq->server:消费队列内容
+server->chan:查询授权智能合约结果
+chan-->server:返回查询结果
+server->server:判断查询结果
+alt 执行成功
+server->server:插入到t_file_info，t_user_file,t_file_enc,t_oper_log
+server-->web:推送一个消息到mqtt中
+else 执行失败
+server->server:记录操作日志
+server-->web:推送一个消息到mqtt中
+else 执行中或者是查询超时
+server->mq:返回到rabbitMq中
+end
+
+@enduml

@@ -1,0 +1,45 @@
+@startuml
+title:用户登录注册
+autonumber
+web->web:用户输入手机号码
+web->server:根据手机号码发送短信验证码
+note left: 手机号码，短信模板
+server->server:校验模板是否存在
+server->sms:发送短信验证码
+sms-->server:返回发送结果
+server-->web:返回发送结果
+web->web:用户输入短信验证码
+web->web:用户点击登录
+web->server:短信验证码登录/注册接口
+note left:手机号码，短信验证码，短信模板id
+server->sms:根据手机号码和短信验证码 模板id 校验短信是否正确
+sms->server:返回校验结果
+alt 校验失败
+server-->web:返回校验失败和具体提示信息
+else 校验成功
+server->server:根据appId,手机号码查询数据库中是否存在
+alt 手机号码存在
+server->ucenter:调用登录接口进行用户登录
+ucenter-->server:返回用户登录结果
+server->server:更新本地用户缓存token信息
+server->server:查询用户记录是否存在keyStroe的私钥和公钥信息
+alt 不存在
+server->server:生成keyStore，将keyStore的公钥和私钥信息保存到数据库中
+end
+server-->web:返回登录结果 grantToken,cuserId
+else 手机号码不存在
+server->ucenter:调用用户注册接口进行用户注册
+ucenter-->server:返回用户注册结果
+server->server:判断用户注册结果
+alt 注册成功
+server->server:将cuserId，手机号码，保存到数据库中
+server->server:生成keyStore的信息
+server->server: 将keyStore 的公钥私钥更新到数据库中
+server-->web:返回用户注册结果 grantToken,cuserId
+else 注册失败
+server-->web:返回注册失败，并提示错误信息
+end
+end
+end
+
+@enduml

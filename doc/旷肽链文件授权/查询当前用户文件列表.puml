@@ -1,0 +1,10 @@
+@startuml
+title:查询当前文件列表
+autonumber
+web->server:请求查询当前用户文件列表
+note left:用户登录token,当前页，每页显示条数
+server->server:校验token 根据token得到cUserId
+server->server:根据cUserId 查询t_user_file和t_file_info 表 条件 org_c_user_id为空的数据，状态为正常的数据
+server->server:得到查询结果
+server-->web:返回查询结果
+@enduml

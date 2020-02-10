@@ -1,0 +1,19 @@
+@startuml
+title:文件下载
+autonumber
+web->web:点击查询我可访问的文件
+web->server:查询我可访问的文件列表接口
+note left: 登录token,分页参数
+server->server:根据token 得到cUserId ,查询t_user_file和t_file_info表
+server-->web:返回可访问文件列表
+...
+web->web:点击下载文件
+web->server:查询当前文件地址
+note left:参数 fileId
+server->server:根据fileId 查询当前登录用户和fileId是否具有绑定关系
+server->server:得到fileId对应的文件地址
+server->server:保存当前用户操作行为
+server-->web:返回文件地址或者是文件流
+web->web:保存文件
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+title:邑卡通第三方应用授权 需要将邑卡通app换成内部app
+participant  邑卡通APP as 邑卡通APP
+participant  支付SDK as 支付SDK
+participant  webview as webview
+participant  邑卡通服务端 as 邑卡通服务端
+autonumber
+邑卡通APP->邑卡通APP:用户点击使用支付SDK
+邑卡通APP->邑卡通APP:用户需要进行授权
+邑卡通APP->webview:将事先配置好的第三方应用url 传递到webview
+webview->webview:打开第三方应用url
+webview->中城服务端:GET请求获取授权页面地址
+note left: 临时票据 code 参数
+TSM->邑卡通服务端:请求对方服务获取授权登录页面地址
+note left: appid,redirect_url,code
+邑卡通服务端-->TSM:返回请求结果
+TSM->TSM:取出授权页面跳转地址
+TSM-->webview:重定向到授权页面跳转地址
+webview->webview:展示授权页面
+webview->webview:用户进行授权
+webview->webview:用户授权完成
+webview->webview:webview 跳转到中城给的redirect_url
+webview->TSM:通过redirect_url请求服务端通知授权成功
+TSM->邑卡通服务端:通过accessToken获取用户信息手机号码
+邑卡通服务端-->TSM:返回外部用户号（openId） 和手机号码
+TSM->UC:根据openid和手机号进行外部用户注册
+UC-->TSM:返回用户注册结果
+TSM->TSM:保存用户信息
+TSM-->webview:返回参数外部用户号
+webview->支付SDK:关闭吧webview,初始化加载SDk
+@enduml

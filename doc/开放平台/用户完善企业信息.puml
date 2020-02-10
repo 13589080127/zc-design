@@ -1,0 +1,40 @@
+@startuml
+title:用户完善企业信息
+autonumber
+participant  开放平台H5 as H5
+participant  lgmPlatManage as MANAGE
+H5->MANAGE:获取全部的国家信息
+MANAGE->MANAGE:查询oracle数据库地区信息
+MANAGE-->H5:返回地区信息
+H5->H5:用户输入相关信息
+H5->H5:用户选择国家信息
+H5->MANAGE:根据国家编号获取省份信息
+MANAGE->H5:返回省份信息
+H5->H5:用户点击上传营业图片
+H5->zcFile:上传文件
+zcFile->H5:返回上传文件的地址
+H5->MANAGE:完善用户信息
+MANAGE->MANAGE:判断当前用户信息是否已经被完善
+alt 用户信息已经被完善
+MANAGE-->H5:返回您已经提交过企业信息，返回审核中的状态
+else 用户信息未完善
+MANAGE->MANAGE:保存企业信息，产生生产商户信息， 状态为未审核
+MANAGE->APPS:调用创建APPID 的接口，产生测试环境的APPID
+APPS->APPS:保存测试APPID和测试机构号品牌号的关系
+APPS-->MANAGE:返回测试APPID
+MANAGE-->H5:返回测试APPID,审核状态
+H5->H5:跳转到第四步输入接入信息
+H5->H5:点击添加应用
+H5->H5:选择应用系统ios/安卓
+H5->H5:输入相应的包名
+H5->MANAGE:将输入的信息提交到服务端
+MANAGE->MANAGE:绑定测试环境商户号和测试环境产品号的支付活动
+MANAGE->MANAGE:调用tsm保存APPID和包名的关系,保存APPID的密钥信息
+MANAGE->MANAGE:在tsm中产生测试环境渠道Id,及对应的密钥信息和APPID对应的渠道信息
+MANAGE->MANAGE:用户中心保存APPID信息
+MANAGE->MANAGE:在apps中保存测试渠道id和测试商户id的关系 csc_mer_channel表
+MANAGE-->H5:返回保存结果和渠道id
+H5->MANAGE:根据渠道id查询密钥信息
+MANAGE-->H5:返回接入的密钥信息
+end
+@enduml

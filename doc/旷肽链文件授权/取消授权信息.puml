@@ -1,0 +1,20 @@
+@startuml
+title:取消授权信息
+autonumber
+web->web:用户点击取消授权
+web->server:调用取消授权接口
+note left: fileId,需要取消授权用户的cUserId,用户token
+server->server:校验用户是否和文件具有绑定关系授权关系
+server->server:查询当前登录用户的地址信息
+server->chan:调用取消授权智能合约
+chan-->server:返回调用是否成功
+server->server:判断是否调用成功
+alt 成功
+server->mq:将此消息加入到rabitmq中等待消费
+else 失败
+server-->web:返回失败具体原因
+else 超时
+server->mq:发送到rabitmq中等待消费
+end
+server-->web:返回正在处理中
+@enduml

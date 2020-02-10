@@ -1,0 +1,17 @@
+@startuml
+title:查询上链交易结果
+autonumber
+mq->server:消费mq队列
+server->chan:根据hash查询上链交易结果
+chan-->server:返回上链交易结果
+server->server:判断上链交易结果
+alt 上链成功
+server->server:保存数据库信息 操作日志
+server->web:将消息通过mqtt推送出去
+else 未处理完成或者是查询超时
+server->mq:返回mq队列
+else 上链失败
+server->server:保存操作日志
+server->web:将消息通过mqtt推送出去 且提示原因
+end
+@enduml

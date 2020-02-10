@@ -1,0 +1,45 @@
+@startuml
+title:批量文件授权
+autonumber
+web->server:查询当前文件已经授权的人
+note left:登录token，分页条件，文件id
+server->server:通过token取出当前登录用户
+server->server:根据file查询t_file_info 的org_file_id
+server->server:得出list集合的fileId 查询t_user_file 表得到当前文件的持有者，除掉当前用户本身
+server->server:根据各文件id查询操作流水表，类型为下载的，是否有下载成功
+server->web:返回数组数据
+...
+web->web:用户输入单个手机号码
+web->web:用户点击回车
+web->server:发起手机号校验
+note left:fileId,手机号
+server->server:校验手机号是否已经注册
+server->server:校验手机号码和文件是否已经存在绑定关系
+server-->web:返回校验结果
+web->web:判断校验结果
+alt 校验成功无错误
+web->web:成功加入待添加的列表中
+else 校验失败
+web->web:校验失败，提示错误信息
+end
+web->server:对待添加的手机号码列表进行授权
+note left: 需要授权的文件id,手机号码列表，登录token
+server->server: 校验文件id和登录用户的关系
+alt 校验失败
+server-->web:返回权限校验错误
+else 校验成功
+server->server:取出当前文件内容对文件进行新的加密
+server->server:对加密后的文件算出hash,文件大小
+server->chan:调用授权智能合约 nonce的输出
+note left:手机号码列表
+chan-->server:返回调用结果
+server->server:判断返回结果
+alt 发送失败
+server-->web:返回错误提示
+else 发送成功
+server->mq:将当前消息放到rabbitMq 队列中消费
+server-->web:返回处理中
+end
+end
+
+@enduml

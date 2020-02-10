@@ -1,0 +1,16 @@
+@startuml
+title:查询取消授权结果
+autonumber
+mq->server:消费取消授权队列
+server->server:根据交易hash 查询智能合约
+server->chan:查询智能合约执行结果
+note left: 交易hash
+chan-->server:返回交易结果
+server->server:判断交易结果
+alt 成功
+server->server:删除t_file_info的信息，删除t_user_file的信息，删除本地文件信息
+server-->web:推送消息到mqtt
+else 失败或者是超时
+server->mq:重新放入mq中
+end
+@enduml

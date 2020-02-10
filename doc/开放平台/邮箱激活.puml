@@ -1,0 +1,49 @@
+@startuml
+title:邮箱激活
+autonumber
+participant  浏览器 as 浏览器
+participant  开放平台H5 as H5
+participant  lgmPlatManage as MANAGE
+participant  用户中心 as UC
+浏览器->浏览器:点击激活链接
+浏览器->H5:跳转到h5页面
+H5->MANAGE:请求服务端激活用户
+note left:邮箱，sign
+MANAGE->MANAGE:验证签名
+alt 验证失败
+MANAGE-->H5:返回链接已经失效
+else 验证成功
+MANAGE->MANAGE:根据邮箱查询redis，判断value的签名是否是当前传入的签名
+alt redis的签名和当前签名不一致
+MANAGE-->H5:返回链接已经失效
+else redis的签名和当前签名一致
+MANAGE->UC:判断当前用户的邮箱是否已经注册
+note left:邮箱，appId
+UC-->MANAGE:返回判断结果
+alt 用户已经注册
+MANAGE-->H5:返回用户已经注册的错误码
+else 用户未注册
+MANAGE->MANAGE:在redis中取出密码
+MANAGE->UC:注册用户
+note left:用户名，密码
+UC-->MANAGE:返回用户注册结果 cuserId,token
+alt 用户注册成功
+MANAGE->MANAGE:推一条消息到mq中
+note left:cuserId,token,用户信息完善级别0
+MANAGE->MANAGE:将用户的token缓存到redis中
+MANAGE-->H5:返回成功 token,cuserId,用户信息完善级别0
+else 用户注册失败
+MANAGE-->H5:返回激活失败
+end
+end
+end
+end
+H5->H5:判断接口返回码
+alt 返回失败
+H5->H5: 提示错误信息
+else 返回成功
+H5->H5:跳转到第三步页面
+end
+
+
+@enduml
