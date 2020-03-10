@@ -10,6 +10,7 @@ server->chan:调用取消授权智能合约
 chan-->server:返回调用是否成功
 server->server:判断是否调用成功
 alt 成功
+server->server: 将t_file_info表状态改为取消授权中，记录操作流水 状态取消授权中
 server->mq:将此消息加入到rabitmq中等待消费
 else 失败
 server-->web:返回失败具体原因
@@ -17,4 +18,6 @@ else 超时
 server->mq:发送到rabitmq中等待消费
 end
 server-->web:返回正在处理中
+web->web:进行消息订阅监听
+web->web:等待10秒钟
 @enduml

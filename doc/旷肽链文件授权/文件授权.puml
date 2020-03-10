@@ -4,7 +4,7 @@ autonumber
 web->server:查询当前文件已经授权的人
 note left:登录token，分页条件，文件id
 server->server:通过token取出当前登录用户
-server->server:根据file查询t_file_info 的org_file_id
+server->server:根据fileId查询t_file_info 的org_file_id
 server->server:得出list集合的fileId 查询t_user_file 表得到当前文件的持有者，除掉当前用户本身
 server->server:根据各文件id查询操作流水表，类型为下载的，是否有下载成功
 server->web:返回数组数据
@@ -36,9 +36,11 @@ chan-->server:返回调用结果
 server->server:判断返回结果
 alt 发送失败
 server-->web:返回错误提示
-else 发送成功
-server->mq:将当前消息放到rabbitMq 队列中消费
+else 发送成功 || 发送超时
+server->server:保存到数据库中 状态为文件授权中，保存表 t_user_file,t_file_info,t_file_enc
+server->server:保存t_oper_log 类型为授权中
 server-->web:返回处理中
+web->web:等待10秒
 end
 end
 

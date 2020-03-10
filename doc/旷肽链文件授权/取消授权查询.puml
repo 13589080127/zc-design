@@ -8,9 +8,17 @@ note left: 交易hash
 chan-->server:返回交易结果
 server->server:判断交易结果
 alt 成功
-server->server:删除t_file_info的信息，删除t_user_file的信息，删除本地文件信息
+server->server:更新t_file_info的信息的状态，更新t_user_file的信息，删除本地文件信息，记录操作流水
 server-->web:推送消息到mqtt
-else 失败或者是超时
+else 失败
+server->server:记录操作流水
 server->mq:重新放入mq中
+else 超时
+server->server:判断当前超时次数 是否大于指定次数
+alt 重试次数小于指定次数
+server->mq:将此消息重新放入rabbitMq中
+else 重试次数大于指定次数
+server->server: 将此消息记录到数据库中
+end
 end
 @enduml

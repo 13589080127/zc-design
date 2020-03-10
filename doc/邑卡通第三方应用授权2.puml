@@ -9,7 +9,7 @@ autonumber
 邑卡通APP->邑卡通APP:用户需要进行授权
 邑卡通APP->webview:将事先配置好的第三方应用url 传递到webview
 webview->webview:打开第三方应用url
-webview->中城服务端:GET请求获取授权页面地址
+webview->TSM:GET请求获取授权页面地址
 note left: 临时票据 code 参数
 TSM->邑卡通服务端:请求对方服务获取授权登录页面地址
 note left: appid,redirect_url,code

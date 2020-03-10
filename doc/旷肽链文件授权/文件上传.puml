@@ -2,26 +2,38 @@
 title: 文件上传
 autonumber
 web->web:用户选择文件
-web->server:请求文件上传接口
-server->server:产生文件摘要
-server->server:对文件进行ccks加密,pack是服务器预先配置
-server->chan:调用上链合约
-note left:nonce 怎么处理？
+web->文件server:上传文件
+note left: 请求头包含token,源文件信息，文件缩略图
+文件server->文件server:验证token是否存在redis
+文件server->文件server:取出redis中的信息，得到用户的密钥信息
+文件server->文件server:对文件进行加密，保存加密后的文件，缩略图，密钥文件
+文件server-->web:返回文件的id
+web->server:通知服务端根据文件id执行上链操作
+server->chan:调用智能合约进行上链操作
 chan->server:返回结果
-server->server:保存文件到本地
-server->chan:调用查询智能合约处理结果
+alt 返回交易hash
+server->server:将用户和文件的关系保存为上链中，并保存交易hash
+server->server:将此消息放到rabbmitMq队列中等待被消费
+server-->web:返回给web端交易hash，订阅mqtt消息主题，等待10秒
+else 未返回交易hash
+server->文件server:通知文件id上链失败
+server-->web:返回系统异常
+end
+...
+rabbmitMq->server:消费mq元素
+server->chan:根据交易hash查询交易结果
 chan-->server:返回处理结果
 server->server:判断处理结果
 alt 处理未完成
-server->mq:将当前hash 放到mq队列中
-server->web:返回当前hash处理中
-web->web:通过mq消息订阅当前hash主题进行监听
+server->server:将当前元素移除队列
+server->web:通过mqtt将消息推给前端交易结果
 else 处理成功
 server->server:保存t_file_info,t_file_enc,t_user_file
 server->server:保存当前文件操作流水表，fileId,cUserId,时间，操作结果
-server-->web:返回处理成功
+server->文件server:将消息通知到文件服务器
+server-->web:通过mqtt将消息推给前端交易结果
 else 处理失败
-server->server:删除本地文件
+server->文件server:将消息通知到文件服务器
 server->server:保存当前文件操作流水表，fileId,cUserId,时间，操作结果
 server-->web:返回处理失败的原因
 end

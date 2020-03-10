@@ -1,5 +1,11 @@
 @startuml
 title:查询可访问的文件列表
 autonumber
-
+web->web:点击查询可访问的文件列表
+web->server:查询可访问的文件列表接口
+note left:登录token,分页条件
+server->server:通过token获取当前cuserId
+server->server:通过cUserId 查询t_user_file，t_file_info,根据创建时间排序
+server-->web:返回可访问文件列表
+web->web:区分可访问文件的状态 1：正常，2：上链中
 @enduml

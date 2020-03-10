@@ -1,17 +1,23 @@
 @startuml
-title:查询上链交易结果
+title:查询文件上传交易结果
 autonumber
 mq->server:消费mq队列
 server->chan:根据hash查询上链交易结果
 chan-->server:返回上链交易结果
 server->server:判断上链交易结果
 alt 上链成功
-server->server:保存数据库信息 操作日志
+server->server:保存操作日志，更新数据库的文件状态
 server->web:将消息通过mqtt推送出去
-else 未处理完成或者是查询超时
+else 未处理完成
 server->mq:返回mq队列
+else 超时
+alt 重试次数小于指定次数
+server->mq:将此消息重新放入rabbitMq中
+else 重试次数大于指定次数
+server->server: 将此消息记录到数据库中
+end
 else 上链失败
-server->server:保存操作日志
+server->server:保存操作日志，更新数据库的文件状态
 server->web:将消息通过mqtt推送出去 且提示原因
 end
 @enduml
