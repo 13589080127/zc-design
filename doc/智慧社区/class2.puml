@@ -1,0 +1,27 @@
+@startuml
+note top of CacheUserCardSecret: 缓存用户的卡私钥信息
+class CacheUserCardSecret{
++ void cacheCardSecret(UserCardSecret userCardSecret);
++ void updateCardSecret(String userId);
++ void removeCardSecret(String userId);
+}
+class GenerateQRCodeFactory{
+    - field Map<QrHeaderEnum,GenerateQRCode> map;
+    + String generateQRCode(QrHeaderEnum qrHeaderEnum,String userId,String cardId);
+}
+together {
+    interface GenerateQRCode{
+        + String generateQRCode(QrHeaderEnum qrHeaderEnum,String userId,String cardId);
+    }
+    class GenerateAuthQRCode{
+        + String generateQRCode(QrHeaderEnum qrHeaderEnum,String userId,String cardId);
+    }
+
+}
+GenerateQRCode <|-- GenerateAuthQRCode
+note top of GenerateAuthQRCode: 生成认证二维码
+note top of GenerateQRCodeFactory: 生成二维码工厂类
+GenerateAuthQRCode -[hidden]--> CacheUserCardSecret
+CacheUserCardSecret -[hidden]> GenerateQRCodeFactory
+
+@enduml

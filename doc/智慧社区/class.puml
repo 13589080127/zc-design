@@ -1,0 +1,30 @@
+@startuml
+note top of PackPool : se对象池
+together {
+    class PackPool {
+    - BlockingQueue<SE> pool;
+    + PackPoll(String path)
+    + SE borrowSE()
+    + void returnSE()
+    + void destroyAll()
+    }
+    note top of CardSecret : 卡密钥类
+    class CardSecret{
+    - field String priKey;
+    - field String ccksId;
+    - field String aid;
+    - field String name;
+    - field String idType;
+    - field String phone;
+    }
+    note top of UserCardSecret : 用户卡密钥类
+    class UserCardSecret {
+    - field String userId;
+    - field Map<String,CardSecret> cardSecret;
+    - field TAuthInfo authInfo;
+    - field int times;
+    - field TimeUnit timeUnit;
+
+    }
+}
+@enduml

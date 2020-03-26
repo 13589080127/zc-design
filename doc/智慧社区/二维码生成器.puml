@@ -1,0 +1,68 @@
+@startuml
+title:二维码生成模块类结构
+together {
+
+    interface QrGenerator{
+        + String generateQr(IQrCode bean)
+    }
+
+    class AuthQrGenerator{
+        + String generateQr(IQrCode bean)
+    }
+}
+
+together {
+    interface IQrCode{
+            + QrHeaderEnum qrHeader()
+            + T extends QrBean getBody();
+    }
+    class AuthIQrCode{
+            + QrHeaderEnum qrHeader()
+            + AuthQrBean getBody();
+    }
+    class AuthQrBean{
+        - String cardId
+        - String aid
+        - String certType
+        - String brhId
+        - String brandId
+        - String userId
+        - String certNum
+        - String userName
+        - long startDate
+        - long endDate
+        - SE se
+        ==get and set ==
+        ...
+        ==public method==
+        +QrHeaderEnum qrHeader()
+    }
+}
+
+
+class QrFactory{
+    + String generateQr(IQrCode bean)
+}
+
+
+
+together {
+    enum QrHeaderEnum{
+        + AUTHENTICATION("021","AuthQrBean.class")
+    }
+}
+
+
+note top of QrGenerator:生成二维码接口定义
+note top of IQrCode:二维码类基类定义
+note top of QrHeaderEnum:二维码码头枚举
+note bottom of AuthQrGenerator:认证二维码生成实现类
+note bottom of AuthQrBean:认证二维码码体数据实体类
+note top of QrFactory:二维码生成工厂类
+
+QrFactory .|>QrGenerator
+QrGenerator<|..AuthQrGenerator
+IQrCode<|..AuthQrBean
+QrGenerator .> IQrCode
+IQrCode .> QrHeaderEnum
+@enduml

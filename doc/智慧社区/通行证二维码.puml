@@ -1,0 +1,28 @@
+
+@startuml
+title 通行证二维码
+participant 巡查app as app
+participant 小程序或app或管理平台 as pro
+
+participant lgm_community as com
+participant 用户中心 as uc
+
+autonumber
+
+====产生二维码==
+pro->com: 获取通行证二维码
+note left: cardId
+com->com: 调用产生二维码的方法， 参数userId,cardId
+pro<--com: 返回 二维码字符串
+
+====校验二维码==
+app->com: 扫一扫
+com->com: 参考北京通二维码认证流程
+com->lgm_certauth:校验二维码（二维码）
+com<--lgm_certauth: 校验结果
+com->com: 查询客户信息
+com->com: 查询登记信息，按照业主优先级排序后取一条
+app<--com: 返回（登记信息）
+
+
+@enduml

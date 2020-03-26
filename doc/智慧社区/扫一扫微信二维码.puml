@@ -1,0 +1,123 @@
+
+@startuml
+title 微信小程序扫一扫
+
+participant  微信 as WX
+participant 小程序 as pro
+participant lgm_community as com
+participant 用户中心 as uc
+
+autonumber
+=====识别二维码==
+WX->WX: 扫一扫
+WX->pro: 启动小程序（二维码）
+pro->com: 扫一扫（open_id,二维码）
+com->com: 查询用户信息，
+alt 用户未找到
+com->com: 若未创建，则完成创建（状态非实名）
+end alt
+com->com:检查用户实名状态
+alt 用户已实名
+com->com:校验用户的卡号是否已开通，如未开通走开通卡流程
+end
+com->com: 解析二维码头，根据码头类型查询对应的\数据库表（分区、小区还是房屋）
+pro<--com: 返回（类型，小区id，小区名字）
+pro->pro: 跳转到对应页面，用户点击登记（触发实名和开卡）
+
+pro->com: 查询用户实名状态
+pro<--com: 返回状态
+=====实名认证==
+alt 未实名
+pro->com: 用户填写实名认证信息，发起认证（实名信息）
+com->com: 根据实名信息查询认证信息表
+alt 未找到认证信息
+com->uc: 认证
+com<-uc: 返回认证结果
+end
+com->com: 则添加认证信息表，更新用户信息表认证状态和认证id
+com->com:获取需要开通的机构号和品牌号查询t_brand_info 卡类型为1的记录
+com->lgm_sdzw: 开卡获取卡号
+note left: 机构号品牌号，实名信息
+com<--lgm_sdzw: 返回卡档，aid,ccksId（卡号）
+com->com:失败不回滚事务
+com->rms: 获取卡私钥信息（卡号，域名，子域list->00000000,00020000）
+rms-->com: 返回密钥信息
+com->com:失败不回滚事务
+com->com: 保存卡号，aid，ccksId、密钥信息,卡状态为注册状态 到t_user_card_map表
+com->com:预加载密钥信息到redis 调用UserCardSecretService cacheCardSecret方法
+pro<-com: 返回认证结果
+end alt
+
+
+
+
+@enduml
+
+
+
+
+@startuml
+title 微信小程序登记
+participant 小程序或app或管理平台 as pro
+participant lgm_community as com
+participant 用户中心 as uc
+
+autonumber
+
+
+pro->com: 查询小区和房号
+pro<--com: 返回
+pro->com: 获取实名信息
+pro<--com: 返回
+
+pro->com: 登记申请
+com->com: 根据用户找到实名信息，与前端的进行比对
+note  over com
+开卡和卡注册流程参考《微信小程序扫一扫》
+end note
+alt 用户下卡不存在
+com->com: 发起开卡流程
+else 用户下卡状态为待注册
+com->com: 更新卡状态为正常状态
+
+
+end alt
+
+
+
+
+
+pro<--com: 返回
+@enduml
+
+
+
+
+@startuml
+title 通行证二维码
+participant 巡查app as app
+participant 小程序或app或管理平台 as pro
+
+participant lgm_community as com
+participant 用户中心 as uc
+
+autonumber
+
+====产生二维码==
+pro->com: 获取通行证二维码
+com->com: 根据用户找到实名信息，根据实名信息找到卡号
+com->lgm_auth_apps: 获取二维码（实名信息，卡号）
+com<--lgm_auth_apps: 返回（二维码）
+pro<--com: 返回
+
+====校验二维码==
+app->com: 扫一扫
+com->com: 参考北京通二维码认证流程
+com->lgm_certauth:校验二维码（二维码）
+com<--lgm_certauth: 校验结果
+com->com: 查询客户信息
+com->com: 查询登记信息，按照业主优先级排序后取一条
+app<--com: 返回（登记信息）
+
+
+@enduml

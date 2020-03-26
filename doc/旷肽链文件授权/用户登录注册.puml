@@ -26,12 +26,12 @@ server->server:查询用户记录是否存在keyStroe的私钥和公钥信息
 alt 不存在
 server->server:生成keyStore，将keyStore的公钥和私钥种子加密保存信息保存到数据库中
 end
-server->server:校验当前用户是否已经申请了用户se文件
+server->server:校验当前用户是否已经申请了用户se密钥
 alt 未申请用户se
-server->server:调用交换申请用户se
+server->server:调用交换申请用户se密钥
 server->server:判断申请结果
 alt 申请成功
-server->server:在本地保存用户se文件
+server->server:将密钥信息保存到用户信息表中
 else 申请失败
 server->server:转换错误码  不回滚事务
 server-->web:返回错误信息提示
@@ -44,21 +44,12 @@ ucenter-->server:返回用户注册结果
 server->server:判断用户注册结果
 alt 注册成功
 server->server:将cuserId，手机号码，保存到数据库中
-server->server:调用交换申请用户se
+server->server:调用交换申请用户se密钥
 server->server:判断返回结果
 alt 申请成功
-server->server:取出固定文件夹路径
-server->server:在固定文件夹路径生成cuserId命名的文件夹
-server->server:在cuserId文件夹下保存用户se
+server->server:将用户的密钥信息保存到用户信息表中
 server->server:生成keyStore的信息
 server->server: 将keyStore 的公钥私钥（加密）种子（加密）更新到数据库中
-server->chan:异步对用户生成的地址进行充值
-note left: 转出账号是固定的，数量是固定的
-chan-->server:返回充值结果
-server->server:判断充值结果
-alt 充值明确失败或者是充值超时
-server->server:重试3次
-end
 server-->web:返回用户注册结果 grantToken,cuserId
 else 申请失败
 server->server:转换错误信息，不回滚事务
