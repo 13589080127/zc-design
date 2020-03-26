@@ -1,0 +1,39 @@
+@startuml
+title:启用邑卡通
+autonumber
+sdk->sdk:点击启用邑卡通
+note left:手机号码，外部用户号，机构号（可空），品牌号（可空）
+sdk->sdk:加载设备se
+sdk->sdk:申请用户se /sdk/apply/retrieve/user
+note left:手机号码，外部用户号
+sdk->apps:用户登录
+note left:cuserId（可空），extUserId（可空），两个不能同时为空
+apps->sdk:返回用户的token，和是否实名状态
+sdk->sdk:判断用户是否实名，是否设置了支付密码
+sdk->sdk:实名认证
+sdk->sdk:判断是否需要设置支付密码
+alt 需要设置支付密码
+sdk->sdk:设置支付密码
+sdk->apps:查询当前用户卡统计数据 url：app/personal/v1/card/census
+note left:机构号，品牌号，appId，token，
+apps->apps:根据appId 和机构号，品牌号查询当前用户未开卡品牌list
+apps->ams:根据手机号码到ams查询当前当前手机号码配置的机构白名单
+ams-->apps:返回机构号白名单信息list
+apps->apps:匹配当前用户未开卡品牌list
+apps->apps:组装推荐开通的虚拟卡品牌info 只有一条
+apps-->sdk:返回未开卡品牌list和推荐开通的虚拟卡品牌info,已开卡卡号list
+sdk->sdk:展示所有未开卡品牌信息，不展示推荐开通的虚拟卡品牌，
+else 不需要设置支付密码
+sdk->apps:查询当前用户卡统计数据 url：app/personal/v1/card/census
+note left:机构号，品牌号，appId，token，
+apps-->sdk:返回未开卡品牌list和推荐开通的虚拟卡品牌info,已开卡卡号list
+sdk->sdk:判断已开通卡的list是否为空
+alt 已开通的卡list为空
+sdk->sdk:跳转到添加卡片页面，将未开通的卡数据带着跳转页面
+else 已开通卡的list不为空
+sdk->sdk:展示已开通的卡list
+end
+end
+
+
+@enduml

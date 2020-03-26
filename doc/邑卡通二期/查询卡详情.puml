@@ -1,0 +1,16 @@
+@startuml
+title:查询卡详情
+autonumber
+sdk->apps:根据卡号查询卡详情 url: ZCAppmanage/app/personal/tat/newCards/detail.do
+note left:卡号,token
+apps->apps:查询卡详情
+apps-->sdk:返回卡详情信息
+sdk->sdk:取第一条产品判断是否可充值
+alt 可充值
+sdk->sdk:展示立即充值和银行卡管理功能
+else 不可充值
+sdk->sdk:不展示立即充值和银行卡管理功能
+end
+
+
+@enduml

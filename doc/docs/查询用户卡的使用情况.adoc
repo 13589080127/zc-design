@@ -1,0 +1,263 @@
+=== 根据用户查询卡的使用情况
+
+- 描述
+
+ 用来在邑卡通二期使用，返回报文中含有，用户已开通的卡集合列表，未开通的卡集合列表，推荐开通的卡集合列表
+
+
+- 引用
+
+
+- 请求地址：
+
+[source]
+----
+ZCAppmanage/app/personal/v1/card/census.do
+----
+
+[source,http,options="nowrap"]
+----
+POST HTTP/1.1
+Content-Type: application/json
+{
+"brhId":"",
+"brandId":""
+} 
+----
+
+- 请求参数说明
+|===
+|Path|Type|Description|required
+
+|`brhId`
+|`String`
+|需要查看的机构号
+|是
+
+|`brandId`
+|`String`
+|需要查看的品牌号
+|否
+
+|===
+
+- 返回参数示例
+----
+{
+    "openCardList": [
+        {
+            "pid":"",
+            "brhId":"",
+            "brandId":"",
+            "brandName":"",
+            "brhName":"",
+            "cardType":"",
+            "backGround":"",
+            "cardImg":"",
+            "cardAgreement":"",
+            "logo_img":"",
+            "mainTitle":"",
+            "subTitle":"",
+            "cardId":"",
+            "cardSta":""
+        },...
+    ],
+    "noOpenCardList":[
+        {
+            "pid":"",
+            "brhId":"",
+            "brandId":"",
+            "brandName":"",
+            "brhName":"",
+            "cardType":"",
+            "backGround":"",
+            "cardImg":"",
+            "cardAgreement":"",
+            "logo_img":"",
+            "mainTitle":"",
+            "subTitle":""
+        },...
+    ],
+    "recommendBrandInfo":{
+        "pid":"",
+            "brhId":"",
+            "brandId":"",
+            "brandName":"",
+            "brhName":"",
+            "cardType":"",
+            "backGround":"",
+            "cardImg":"",
+            "cardAgreement":"",
+            "logo_img":"",
+            "mainTitle":"",
+            "subTitle":""
+    }
+  "userId":""
+}
+----
+- 返回参数说明
+|===
+|Path|Type|Description
+
+|`openCardList`
+|`List`
+|已开卡列表
+
+|`openCardList.pid`
+|`String`
+|已开卡的品牌id
+
+|`openCardList.brhId`
+|`String`
+|已开卡的机构号
+
+|`openCardList.brandId`
+|`String`
+|已开卡的品牌号
+
+|`openCardList.brandName`
+|`String`
+|已开卡的品牌名称
+
+|`openCardList.brhName`
+|`String`
+|已开卡的机构号名称
+
+|`openCardList.cardType`
+|`String`
+|已开卡的类型
+
+|`openCardList.backGround`
+|`String`
+|背景颜色
+
+|`openCardList.cardAgreement`
+|`String`
+|开卡协议
+
+|`openCardList.logoImg`
+|`String`
+|卡的logo
+
+|`openCardList.mainTitle`
+|`String`
+|卡的主标题
+
+|`openCardList.subTitle`
+|`String`
+|卡的副标题
+
+|`openCardList.cardId`
+|`String`
+|卡号
+
+|`openCardList.cardSta`
+|`String`
+|卡的状态
+
+|`noOpenCardList`
+|`String`
+|未开通卡集合
+
+|`noOpenCardList.pid`
+|`String`
+|卡的品牌id
+
+|`noOpenCardList.brhId`
+|`String`
+|卡的机构号
+
+|`noOpenCardList.brandId`
+|`String`
+|卡的品牌号
+
+|`noOpenCardList.brandName`
+|`String`
+|卡的品牌名称
+
+|`noOpenCardList.brhName`
+|`String`
+|卡的机构号名称
+
+|`noOpenCardList.cardType`
+|`String`
+|卡的类型
+
+|`noOpenCardList.backGround`
+|`String`
+|背景颜色
+
+|`noOpenCardList.cardAgreement`
+|`String`
+|开卡协议
+
+|`noOpenCardList.logoImg`
+|`String`
+|卡的logo
+
+|`noOpenCardList.mainTitle`
+|`String`
+|卡的主标题
+
+|`noOpenCardList.subTitle`
+|`String`
+|卡的副标题
+
+|`userId`
+|`String`
+|当前用户id
+
+|`recommendBrandInfo`
+|`Object`
+|推荐开通的卡品牌信息
+
+|`recommendBrandInfo.pid`
+|`String`
+|卡的品牌id
+
+|`recommendBrandInfo.brhId`
+|`String`
+|卡的机构号
+
+|`recommendBrandInfo.brandId`
+|`String`
+|卡的品牌号
+
+|`recommendBrandInfo.brandName`
+|`String`
+|卡的品牌名称
+
+|`recommendBrandInfo.brhName`
+|`String`
+|卡的机构号名称
+
+|`recommendBrandInfo.cardType`
+|`String`
+|卡的类型
+
+|`recommendBrandInfo.backGround`
+|`String`
+|背景颜色
+
+|`recommendBrandInfo.cardAgreement`
+|`String`
+|开卡协议
+
+|`recommendBrandInfo.logoImg`
+|`String`
+|卡的logo
+
+|`recommendBrandInfo.mainTitle`
+|`String`
+|卡的主标题
+
+|`recommendBrandInfo.subTitle`
+|`String`
+|卡的副标题
+
+|`recommendBrandInfo.cardId`
+|`String`
+|卡号
+
+|===
+
